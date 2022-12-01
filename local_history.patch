@@ -1,0 +1,110 @@
+Index: Lr2/Game_Accounts.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Lr2/Game_Accounts.cs b/Lr2/Game_Accounts.cs
+--- a/Lr2/Game_Accounts.cs	
++++ b/Lr2/Game_Accounts.cs	(date 1669485056006)
+@@ -9,39 +9,25 @@
+         internal string UserName;
+         internal string AccountType = "Basic";
+         internal int CurrentRating = 1;
+-        internal static int GameId = 690068;
+-        internal static Random RandRating = new Random();
++        internal int GameId = 690068;
++        internal Random RandRating = new Random();
+         internal List<Game> GameList = new List<Game>();
+         public BasicGameAccount(string userName){
+             UserName = userName;
+         }
+ 
+-        public abstract void DecideGameResult(BasicGameAccount opponent,Enum gameResult){
+-            int ratingAmount = RandRating.Next(35);
+-            GameId++;
+-            if (gameResult.Equals(GameResults.Win)){
+-                WinGame(ratingAmount,opponent.UserName);
+-                opponent.LoseGame(ratingAmount,UserName);
+-            }else{
+-                if (gameResult.Equals(GameResults.Lose)){
+-                    LoseGame(ratingAmount,opponent.UserName);
+-                    opponent.WinGame(ratingAmount,UserName);
+-                }
+-            }
+-        }
+-        
+-        public virtual void WinGame(int ratingAmount,String opponentName){
++        public virtual void WinGame(int ratingAmount,String opponentName, String gameType){
+             CurrentRating += ratingAmount;
+-            Game winGame = new Game(GameId, ratingAmount, opponentName, "Win");
++            Game winGame = new Game(GameId, ratingAmount, opponentName, "Win", gameType);
+             GameList.Add(winGame);
+         }
+ 
+-        public virtual void LoseGame(int ratingAmount, String opponentName){
++        public virtual void LoseGame(int ratingAmount, String opponentName, String gameType){
+             CurrentRating -= ratingAmount;
+             if (CurrentRating < 1){
+                 CurrentRating = 1;
+             }
+-            Game loseGame = new Game(GameId, -ratingAmount, opponentName, "Lose");
++            Game loseGame = new Game(GameId, -ratingAmount, opponentName, "Lose", gameType);
+             GameList.Add(loseGame);
+         }
+ 
+@@ -51,7 +37,7 @@
+             Console.WriteLine("| Current rating: "+CurrentRating+" | Games played: "+GameList.Count+" | Account type: "+AccountType+" |");
+             Console.WriteLine();
+             foreach (var game in GameList){
+-                Console.WriteLine("|\t Game ID:"+game.GameId+" \t|\t Opponent: "+game.OpponentName+" \t|\t Game result: "+game.GameResult+" \t|\t Game rating:"+game.RatingAmount+" \t|");
++                Console.WriteLine("|\t Game ID:"+game.GameId+" \t|\t Opponent: "+game.OpponentName+" \t|\t Game type: "+game.GameType+" \t|\t Game result: "+game.GameResult+" \t|\t Game rating:"+game.RatingAmount+" \t|");
+             }
+         }
+     }
+@@ -68,8 +54,8 @@
+                 AccountType = "Prime";
+             }
+ 
+-            public override void WinGame(int ratingAmount, string opponentName){
+-                base.WinGame((int)Math.Round(ratingAmount+ratingAmount*CheckWinStreak()), opponentName);
++            public override void WinGame(int ratingAmount, string opponentName, string gameType){
++                base.WinGame((int)Math.Round(ratingAmount+ratingAmount*CheckWinStreak()), opponentName, gameType);
+             }
+ 
+             public double CheckWinStreak(){
+@@ -89,15 +75,15 @@
+                 AccountType = "PrimeDeluxe";
+             }
+             
+-            public override void WinGame(int ratingAmount, string opponentName){
++            public override void WinGame(int ratingAmount, string opponentName, string gameType){
+                 CurrentRating += (int)Math.Round(ratingAmount+ratingAmount*CheckWinStreak());
+-                Game winGame = new Game(GameId, (int)Math.Round(ratingAmount+ratingAmount*CheckWinStreak()), opponentName, "Win");
++                Game winGame = new Game(GameId, (int)Math.Round(ratingAmount+ratingAmount*CheckWinStreak()), opponentName, "Win", gameType);
+                 GameList.Add(winGame);
+             }
+ 
+-            public override void LoseGame(int ratingAmount, string opponentName)
++            public override void LoseGame(int ratingAmount, string opponentName, string gameType)
+             {
+-                base.LoseGame((int)Math.Round(ratingAmount-ratingAmount*0.25), opponentName);
++                base.LoseGame((int)Math.Round(ratingAmount-ratingAmount*0.25), opponentName, gameType);
+             }
+ 
+             public double CheckWinStreak(){
+@@ -115,12 +101,14 @@
+             public readonly int RatingAmount;
+             public readonly string OpponentName;
+             public readonly string GameResult;
++            public readonly string GameType;
+ 
+-            public Game(int gameId, int ratingAmount, string opponentName, string gameResult){
++            public Game(int gameId, int ratingAmount, string opponentName, string gameResult, string gameType){
+                 GameId = gameId+1;
+                 RatingAmount = ratingAmount;
+                 OpponentName = opponentName;
+                 GameResult = gameResult;
++                GameType = gameType;
+             }
+         }
+ 
