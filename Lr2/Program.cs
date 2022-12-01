@@ -25,6 +25,11 @@ namespace Lr2
             DecideGameResult(createGame.CreateNormalGame(chokopie,oleja),GameResults.Win);
             DecideGameResult(createGame.CreateNormalGame(chokopie,bober),GameResults.Win);
             DecideGameResult(createGame.CreatePvEGame(chokopie),GameResults.Lose);
+            DecideGameResult(createGame.CreateNormalGame(tilt,kirgo),GameResults.Win);
+            DecideGameResult(createGame.CreateNormalGame(tilt,oleja),GameResults.Win);
+            DecideGameResult(createGame.CreateNormalGame(tilt,chokopie),GameResults.Win);
+            DecideGameResult(createGame.CreateNormalGame(tilt,scamenko),GameResults.Lose);
+            DecideGameResult(createGame.CreateNormalGame(tilt,bober),GameResults.Win);
             oleja.PrintStats();
             bober.PrintStats();
             tilt.PrintStats();
