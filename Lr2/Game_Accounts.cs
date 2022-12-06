@@ -7,10 +7,22 @@ namespace Lr2
     {
         public static int BasicGameId = 690068;
         public abstract class BasicGameAccount{ 
-        internal readonly string UserName;
-        internal string AccountType = "Basic";
-        internal int CurrentRating = 1;
-        internal readonly List<Game> GameList = new List<Game>();
+        public readonly string UserName;
+        private protected AccountTypes AccountType = AccountTypes.Basic;
+        private int _curRating = 1;
+
+        protected int CurrentRating
+        {
+            get => _curRating;
+            set
+            {
+                _curRating = value;
+                if (_curRating < 1){
+                    _curRating = 1;
+                }
+            }
+        }
+        protected readonly List<Game> GameList = new List<Game>();
 
         protected BasicGameAccount(string userName){
             UserName = userName;
@@ -24,9 +36,6 @@ namespace Lr2
 
         public virtual void LoseGame(String opponentName,GameTypes.BasicGame basicGame){
             CurrentRating -= basicGame.RatingAmount;
-            if (CurrentRating < 1){
-                CurrentRating = 1;
-            }
             Game loseGame = new Game(BasicGameId, -basicGame.RatingAmount, opponentName, "Lose", basicGame.GameType);
             GameList.Add(loseGame);
         }
@@ -50,8 +59,9 @@ namespace Lr2
         
         public class PrimeAccount : BasicGameAccount
         {
-            public PrimeAccount(string userName) : base(userName){
-                AccountType = "Prime";
+            public PrimeAccount(string userName) : base(userName)
+            {
+                AccountType = AccountTypes.Prime;
             }
 
             public override void WinGame(string opponentName, GameTypes.BasicGame basicGame){
@@ -101,7 +111,7 @@ namespace Lr2
         public class PrimeDeluxeAccount : BasicGameAccount
         {
             public PrimeDeluxeAccount(string userName) : base(userName){
-                AccountType = "PrimeDeluxe";
+                AccountType = AccountTypes.PrimeDeluxe;
             }
             
             public override void WinGame(string opponentName, GameTypes.BasicGame basicGame){
@@ -112,9 +122,6 @@ namespace Lr2
 
             public override void LoseGame(string opponentName, GameTypes.BasicGame basicGame){
                 CurrentRating -= (int)Math.Round(basicGame.RatingAmount-basicGame.RatingAmount*0.25);
-                if (CurrentRating < 1){
-                    CurrentRating = 1;
-                }
                 Game loseGame = new Game(BasicGameId, -(int)Math.Round(basicGame.RatingAmount-basicGame.RatingAmount*0.25), opponentName, "Lose", basicGame.GameType);
                 GameList.Add(loseGame);
             }
@@ -134,7 +141,7 @@ namespace Lr2
                     }
                 }
             }
-            
+
             private double CheckForPrint(Game game){
                 int streakCounter = 0;
                 int i = GameList.IndexOf(game)-1;
@@ -155,20 +162,36 @@ namespace Lr2
                 return 0.05*streakCounter;
             }
         }
+        
+        public class BotAccount : BasicGameAccount
+        {
+            public BotAccount(string userName) : base(userName)
+            {
+                AccountType = AccountTypes.Bot;
+            }
+        }
         public class Game{
             public readonly int GameId;
             public readonly int RatingAmount;
             public readonly string OpponentName;
             public readonly string GameResult;
-            public readonly string GameType;
+            public readonly GameTypesNames GameType;
 
-            public Game(int gameId, int ratingAmount, string opponentName, string gameResult, string gameType){
+            public Game(int gameId, int ratingAmount, string opponentName, string gameResult, GameTypesNames gameType){
                 GameId = gameId+1;
                 RatingAmount = ratingAmount;
                 OpponentName = opponentName;
                 GameResult = gameResult;
                 GameType = gameType;
             }
+        }
+
+        public enum AccountTypes
+        {
+            Basic,
+            Prime,
+            PrimeDeluxe,
+            Bot
         }
     }
 }
